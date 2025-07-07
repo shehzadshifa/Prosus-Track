@@ -8,6 +8,7 @@ from .config import settings
 from .agent import agent
 from .knowledge_graph import knowledge_graph
 from .groq_client import groq_client
+from .serp_api import serp_api
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -46,6 +47,56 @@ class UserProfileRequest(BaseModel):
 class RecommendationResponse(BaseModel):
     user_id: str
     recommendations: List[Dict[str, Any]]
+
+# Food Ordering Models
+class RestaurantSearchRequest(BaseModel):
+    query: str
+    location: str = "New York"
+
+class OrderRequest(BaseModel):
+    restaurantId: str
+    items: List[Dict[str, Any]]
+    deliveryAddress: str
+    paymentMethod: str
+
+# Travel Booking Models
+class FlightSearchRequest(BaseModel):
+    from_location: str
+    to_location: str
+    date: str
+    passengers: int = 1
+
+class HotelSearchRequest(BaseModel):
+    location: str
+    check_in: str
+    check_out: str
+    guests: int = 2
+
+class FlightBookingRequest(BaseModel):
+    flightId: str
+    passengers: List[Dict[str, str]]
+    paymentMethod: str
+
+class HotelBookingRequest(BaseModel):
+    hotelId: str
+    check_in: str
+    check_out: str
+    guests: int
+    paymentMethod: str
+
+# Marketplace Models
+class ProductSearchRequest(BaseModel):
+    query: str
+    category: Optional[str] = None
+    condition: Optional[str] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
+
+class ProductPurchaseRequest(BaseModel):
+    productId: str
+    quantity: int
+    shippingAddress: str
+    paymentMethod: str
 
 # Startup event
 @app.on_event("startup")
@@ -188,6 +239,224 @@ async def clear_conversation_history():
             detail=f"Error clearing conversation history: {str(e)}"
         )
 
+# Food Ordering Endpoints
+@app.get("/food/restaurants")
+async def search_restaurants(query: str, location: str = "New York"):
+    """Search for restaurants using SerpApi."""
+    try:
+        restaurants = serp_api.search_restaurants(query, location)
+        return {"restaurants": restaurants}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching restaurants: {str(e)}"
+        )
+
+@app.get("/food/restaurants/{restaurant_id}/menu")
+async def get_restaurant_menu(restaurant_id: str):
+    """Get restaurant menu (mock data for demo)."""
+    menu_items = [
+        {
+            "id": "item_1",
+            "name": "Margherita Pizza",
+            "description": "Fresh mozzarella, tomato sauce, basil",
+            "price": 18.99,
+            "category": "Pizza",
+            "image": "https://via.placeholder.com/200x150?text=Pizza"
+        },
+        {
+            "id": "item_2",
+            "name": "Caesar Salad",
+            "description": "Romaine lettuce, parmesan, croutons",
+            "price": 12.99,
+            "category": "Salad",
+            "image": "https://via.placeholder.com/200x150?text=Salad"
+        }
+    ]
+    return {"menu_items": menu_items}
+
+@app.post("/food/order")
+async def place_food_order(request: OrderRequest):
+    """Place a food order."""
+    try:
+        # Simulate order processing
+        order_id = f"order_{len(request.items)}_{hash(str(request))}"
+        return {
+            "order_id": order_id,
+            "status": "confirmed",
+            "estimated_delivery": "30-45 minutes",
+            "total": sum(item.get("price", 0) * item.get("quantity", 1) for item in request.items)
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error placing order: {str(e)}"
+        )
+
+# Travel Booking Endpoints
+@app.get("/travel/flights")
+async def search_flights(
+    from_location: str,
+    to_location: str,
+    date: str,
+    passengers: int = 1
+):
+    """Search for flights using SerpApi."""
+    try:
+        flights = serp_api.search_flights(from_location, to_location, date)
+        return {"flights": flights}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching flights: {str(e)}"
+        )
+
+@app.get("/travel/hotels")
+async def search_hotels(
+    location: str,
+    check_in: str,
+    check_out: str,
+    guests: int = 2
+):
+    """Search for hotels using SerpApi."""
+    try:
+        hotels = serp_api.search_hotels(location, check_in, check_out)
+        return {"hotels": hotels}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching hotels: {str(e)}"
+        )
+
+@app.post("/travel/flights/book")
+async def book_flight(request: FlightBookingRequest):
+    """Book a flight."""
+    try:
+        booking_id = f"flight_booking_{hash(str(request))}"
+        return {
+            "booking_id": booking_id,
+            "status": "confirmed",
+            "flight_id": request.flightId,
+            "passengers": request.passengers
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error booking flight: {str(e)}"
+        )
+
+@app.post("/travel/hotels/book")
+async def book_hotel(request: HotelBookingRequest):
+    """Book a hotel."""
+    try:
+        booking_id = f"hotel_booking_{hash(str(request))}"
+        return {
+            "booking_id": booking_id,
+            "status": "confirmed",
+            "hotel_id": request.hotelId,
+            "check_in": request.check_in,
+            "check_out": request.check_out,
+            "guests": request.guests
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error booking hotel: {str(e)}"
+        )
+
+@app.post("/travel/itinerary")
+async def create_itinerary(request: Dict[str, Any]):
+    """Create a travel itinerary."""
+    try:
+        itinerary_id = f"itinerary_{hash(str(request))}"
+        return {
+            "itinerary_id": itinerary_id,
+            "status": "created",
+            "flights": request.get("flights", []),
+            "hotels": request.get("hotels", []),
+            "activities": request.get("activities", [])
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error creating itinerary: {str(e)}"
+        )
+
+# Marketplace Endpoints
+@app.get("/marketplace/products")
+async def search_products(
+    query: Optional[str] = None,
+    category: Optional[str] = None,
+    condition: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None
+):
+    """Search for products using SerpApi."""
+    try:
+        products = serp_api.search_products(query or "electronics", category or "General")
+        return {"products": products}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching products: {str(e)}"
+        )
+
+@app.get("/marketplace/products/{product_id}")
+async def get_product(product_id: str):
+    """Get product details."""
+    try:
+        # Mock product data
+        product = {
+            "id": product_id,
+            "name": "iPhone 15 Pro",
+            "description": "Latest iPhone with advanced features",
+            "price": 999.99,
+            "category": "Electronics",
+            "condition": "new",
+            "seller": "Apple Store",
+            "image": "https://via.placeholder.com/300x200?text=iPhone+15+Pro"
+        }
+        return product
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting product: {str(e)}"
+        )
+
+@app.post("/marketplace/purchase")
+async def purchase_product(request: ProductPurchaseRequest):
+    """Purchase a product."""
+    try:
+        purchase_id = f"purchase_{hash(str(request))}"
+        return {
+            "purchase_id": purchase_id,
+            "status": "confirmed",
+            "product_id": request.productId,
+            "quantity": request.quantity,
+            "shipping_address": request.shippingAddress
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error purchasing product: {str(e)}"
+        )
+
+@app.post("/marketplace/sell")
+async def sell_product(request: Dict[str, Any]):
+    """List a product for sale."""
+    try:
+        listing_id = f"listing_{hash(str(request))}"
+        return {
+            "listing_id": listing_id,
+            "status": "active",
+            "product": request
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error creating listing: {str(e)}"
+        )
+
 # API documentation endpoint
 @app.get("/docs")
 async def get_api_docs():
@@ -200,6 +469,18 @@ async def get_api_docs():
             "GET /user/{user_id}/recommendations": "Get personalized recommendations",
             "GET /conversation/history": "Get conversation history",
             "DELETE /conversation/history": "Clear conversation history",
+            "GET /food/restaurants": "Search restaurants",
+            "GET /food/restaurants/{id}/menu": "Get restaurant menu",
+            "POST /food/order": "Place food order",
+            "GET /travel/flights": "Search flights",
+            "GET /travel/hotels": "Search hotels",
+            "POST /travel/flights/book": "Book flight",
+            "POST /travel/hotels/book": "Book hotel",
+            "POST /travel/itinerary": "Create itinerary",
+            "GET /marketplace/products": "Search products",
+            "GET /marketplace/products/{id}": "Get product details",
+            "POST /marketplace/purchase": "Purchase product",
+            "POST /marketplace/sell": "Sell product",
             "GET /health": "Health check",
             "GET /": "Application info"
         },

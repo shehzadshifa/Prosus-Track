@@ -10,7 +10,10 @@ class Settings(BaseSettings):
     
     # Groq API Configuration
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")  # LLaMA model via Groq
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama3-8b-8192")  # LLaMA 3 8B model via Groq
+    
+    # SerpApi Configuration
+    SERP_API_KEY: str = os.getenv("SERP_API_KEY", "")
     
     # Neo4j Configuration
     NEO4J_URI: str = os.getenv("NEO4J_URI", "bolt://localhost:7687")

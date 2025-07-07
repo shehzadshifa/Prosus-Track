@@ -1,0 +1,213 @@
+{
+  "info": {
+    "name": "Agent-Powered E-Commerce API",
+    "description": "AI-powered shopping assistant API with Groq LLM and Neo4j knowledge graph",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "Get Application Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            },
+            "description": "Get basic application information and status"
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Simple health check endpoint"
+          },
+          "response": []
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/docs",
+              "host": ["{{base_url}}"],
+              "path": ["docs"]
+            },
+            "description": "Get API documentation and endpoint information"
+          },
+          "response": []
+        }
+      ],
+      "description": "Basic health and information endpoints"
+    },
+    {
+      "name": "Chat with AI Agent",
+      "item": [
+        {
+          "name": "Chat with Shopping Assistant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"I'm looking for a new laptop for gaming\",\n  \"user_id\": \"user123\",\n  \"context\": \"User is shopping for electronics\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat",
+              "host": ["{{base_url}}"],
+              "path": ["chat"]
+            },
+            "description": "Main chat endpoint to interact with the AI shopping assistant"
+          },
+          "response": []
+        },
+        {
+          "name": "Simple Chat Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What smartphones do you recommend?\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat",
+              "host": ["{{base_url}}"],
+              "path": ["chat"]
+            },
+            "description": "Simple chat with default user"
+          },
+          "response": []
+        }
+      ],
+      "description": "Chat with the AI-powered shopping assistant"
+    },
+    {
+      "name": "User Profile Management",
+      "item": [
+        {
+          "name": "Create/Update User Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"user123\",\n  \"profile_data\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"preferences\": [\"electronics\", \"gaming\", \"laptops\"],\n    \"budget_range\": \"500-1500\",\n    \"location\": \"New York\",\n    \"shopping_history\": [\"laptop\", \"mouse\", \"headphones\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["user", "profile"]
+            },
+            "description": "Create or update a user profile in the knowledge graph"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/user123/profile",
+              "host": ["{{base_url}}"],
+              "path": ["user", "user123", "profile"]
+            },
+            "description": "Retrieve user profile from the knowledge graph"
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage user profiles and preferences"
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "Get User Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/user123/recommendations",
+              "host": ["{{base_url}}"],
+              "path": ["user", "user123", "recommendations"]
+            },
+            "description": "Get personalized recommendations for a user"
+          },
+          "response": []
+        }
+      ],
+      "description": "Get personalized product recommendations"
+    },
+    {
+      "name": "Conversation Management",
+      "item": [
+        {
+          "name": "Get Conversation History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/conversation/history",
+              "host": ["{{base_url}}"],
+              "path": ["conversation", "history"]
+            },
+            "description": "Retrieve the current conversation history"
+          },
+          "response": []
+        },
+        {
+          "name": "Clear Conversation History",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/conversation/history",
+              "host": ["{{base_url}}"],
+              "path": ["conversation", "history"]
+            },
+            "description": "Clear the conversation history"
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage conversation history"
+    }
+  ]
+} 

@@ -13,9 +13,9 @@ fi
 echo "🔧 Activating virtual environment..."
 source venv/bin/activate
 
-# Install dependencies
-echo "📥 Installing dependencies..."
-pip install -r requirements.txt
+# (Optional) Install dependencies
+# echo "📥 Installing dependencies..."
+# pip install -r requirements.txt
 
 # Check if .env file exists
 if [ ! -f ".env" ]; then
@@ -39,4 +39,4 @@ echo "Press Ctrl+C to stop the server"
 echo ""
 
 # Run the FastAPI application
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
